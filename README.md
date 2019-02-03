@@ -119,7 +119,7 @@ now lets create the grader user and add him to the sudo group
 
 ```
 sudo adduser grader
-```
+``
 
 Add the user to the sudo group:
 
@@ -153,7 +153,7 @@ now let's update the hole system:
 sudo apt-get update
 sudo apt-get upgrade
 sudo apt-get dist-upgrade
-```¨
+```
 
 ### Install apache
 
