@@ -36,6 +36,13 @@ sudo nano /etc/ssh/sshd_config
 change the listen port to 2200:
 ![alt text](resources/screenshots/sshd_config.png "sshd config")
 
+make also sure that only login with key pair is allowed:
+so:
+```
+PasswordAuthentication no
+```
+
+
 restart the ssh service so the port changes happens:
 ```
 sudo /etc/init.d/ssh restart
@@ -59,7 +66,7 @@ we have two firewalls:
 for this course i will configure both firwalls similar:
 
 1. AWS Firewall
-![alt text](resources/screenshots/aws_firewall_config.png =200x "AWS Firewall")
+![alt text](resources/screenshots/aws_firewall_config.png "AWS Firewall")
 
 2. ufw Firewall
 make sure the firewall is not enabled: (otherwise you could block yourself out)
@@ -101,13 +108,31 @@ here we see our defined rules:
 ![alt text](resources/screenshots/ufw_status.png "UFW Firewall")
 
 
-
-
+### Grader User
+now lets create the grader user and add him to the sudo group
 
 ```
-adduser grader
-
+sudo adduser grader
 ``
+Add the user to the sudo group:
+
+```
+sudo usermod -aG sudo grader
+```
+
+Now generation a ssh key for the grader user: (on the laptop)
+```
+ssh-keygen -t rsa -b 4096
+```
+
+on the server add the public key to the authorized_keys file of the grader user:
+```
+su grader
+nano ~/.ssh/authorized_keys
+```
+
+
+
 
 
 
