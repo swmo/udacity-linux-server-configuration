@@ -113,7 +113,7 @@ now lets create the grader user and add him to the sudo group
 
 ```
 sudo adduser grader
-``
+```
 
 Add the user to the sudo group:
 
