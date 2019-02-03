@@ -95,7 +95,7 @@ sudo ufw allow 80/tcp
 Allow incoming ntp:
 ```
 sudo ufw allow 123/udp
-``
+```
 Now we can activate the ufw firewall:
 ```
 sudo ufw enable
@@ -113,7 +113,7 @@ now lets create the grader user and add him to the sudo group
 
 ```
 sudo adduser grader
-``
+```
 Add the user to the sudo group:
 
 ```
