@@ -197,6 +197,15 @@ make sure you have added the filesMatch in <Directory /var/www/html> .. </Direco
 </Directory>
 ```
 
+make sure the apache runs under his own user / group:
+```
+cat /etc/apache2/envvars
+
+it should be like: not root!!
+export APACHE_RUN_USER=www-data
+export APACHE_RUN_GROUP=www-data
+```
+
 ```
 sudo service apache2 restart
 ``
