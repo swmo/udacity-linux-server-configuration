@@ -99,7 +99,8 @@ sudo ufw allow 123/udp
 Now we can activate the ufw firewall:
 ```
 sudo ufw enable
-``
+```
+
 Now we can check the configuration:
 ```
 sudo ufw status
@@ -107,13 +108,13 @@ sudo ufw status
 here we see our defined rules:
 ![alt text](resources/screenshots/ufw_status.png "UFW Firewall")
 
-
 ### Grader User
 now lets create the grader user and add him to the sudo group
 
 ```
 sudo adduser grader
-```
+``
+
 Add the user to the sudo group:
 
 ```
@@ -121,11 +122,13 @@ sudo usermod -aG sudo grader
 ```
 
 Now generation a ssh key for the grader user: (on the laptop)
+
 ```
 ssh-keygen -t rsa -b 4096
 ```
 
 on the server add the public key to the authorized_keys file of the grader user:
+
 ```
 su grader
 nano ~/.ssh/authorized_keys
