@@ -59,7 +59,7 @@ we have two firewalls:
 for this course i will configure both firwalls similar:
 
 1. AWS Firewall
-![alt text](resources/screenshots/aws_firewall_config.png "AWS Firewall")
+![alt text](resources/screenshots/aws_firewall_config.png "AWS Firewall" =400x)
 
 2. ufw Firewall
 make sure the firewall is not enabled: (otherwise you could block yourself out)
