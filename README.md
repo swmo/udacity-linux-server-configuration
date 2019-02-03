@@ -179,10 +179,8 @@ Disable List of files
 ```
 <Directory /var/www/html>
     Options -Indexes
-
     <FilesMatch "^index\.">
-	    Order allow,deny
-	    allow from all
+	    Require all granted
    </FilesMatch>
 </Directory>
 ```
@@ -192,12 +190,12 @@ make sure you have added the filesMatch in <Directory /var/www/html> .. </Direco
 ```
 <Directory />
    Options None
-   Order deny,allow
-   Deny from all
+   Require all denied
 </Directory>
 ```
 
 make sure the apache runs under his own user / group:
+
 ```
 cat /etc/apache2/envvars
 
@@ -208,7 +206,8 @@ export APACHE_RUN_GROUP=www-data
 
 ```
 sudo service apache2 restart
-``
+```
+
 
 
 
