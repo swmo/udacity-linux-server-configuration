@@ -38,10 +38,16 @@ change the listen port to 2200:
 
 make also sure that only login with key pair is allowed:
 so:
+
 ```
 PasswordAuthentication no
 ```
 
+and also no ssh root login is allowed:
+
+```
+PermitRootLogin no #prohibit-password would mean that it's possible over a key pair
+```
 
 restart the ssh service so the port changes happens:
 ```
@@ -113,7 +119,7 @@ now lets create the grader user and add him to the sudo group
 
 ```
 sudo adduser grader
-```
+``
 
 Add the user to the sudo group:
 
@@ -131,8 +137,69 @@ on the server add the public key to the authorized_keys file of the grader user:
 
 ```
 su grader
+mkdir ~/.ssh
+chmod 700 ~/.ssh
 nano ~/.ssh/authorized_keys
 ```
+
+now your able to login over ssh:
+```
+ssh grader@52.29.225.13 -i .ssh/<private key file> -p 2200
+```
+
+### Updates
+now let's update the hole system:
+```
+sudo apt-get update
+sudo apt-get upgrade
+sudo apt-get dist-upgrade
+```¨
+
+### Install apache
+
+```
+sudo apt-get install apache2
+```
+
+Now the apache already returns a default website: 
+http://52.29.225.13/
+
+#### secure Apache
+```
+sudo nano /etc/apache2/apache2.conf
+```
+only return minimal information to the client
+```
+ServerSignature Off
+ServerTokens Prod
+```
+
+
+Disable List of files
+```
+<Directory /var/www/html>
+    Options -Indexes
+
+    <FilesMatch "^index\.">
+	    Order allow,deny
+	    allow from all
+   </FilesMatch>
+</Directory>
+```
+
+restrict access to directory:
+make sure you have added the filesMatch in <Directory /var/www/html> .. </Direcotry> otherwise your index file is not accessible anymore.
+```
+<Directory />
+   Options None
+   Order deny,allow
+   Deny from all
+</Directory>
+```
+
+```
+sudo service apache2 restart
+``
 
 
 
@@ -143,3 +210,5 @@ nano ~/.ssh/authorized_keys
 - udacity course (Deploying to Linux Servers)
 - https://www.digitalocean.com/community/tutorials/how-to-create-a-sudo-user-on-ubuntu-quickstart
 - http://www.linuxlookup.com/howto/change_default_ssh_port
+- https://blog.buettner.xyz/sichere-ssh-konfiguration/
+- https://www.tecmint.com/apache-security-tips/
