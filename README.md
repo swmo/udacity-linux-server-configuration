@@ -1,7 +1,12 @@
 # udacity-linux-server-configuration
 
+## Getting started:
+the grader user information (private key / password) are submitted with the project 
 
-## Setup:
+- catalog is deployed under: [http://catalog.udacity.swmo.ch/]: http://catalog.udacity.swmo.ch/
+- neighborhood-map is deployed under: [http://neighborhood-map.udacity.swmo.ch/]:  
+
+## Documentation:
 
 ### ssh access:
 first we create a ssh key to connect the aws instance.
@@ -164,47 +169,6 @@ sudo apt-get install apache2
 Now the apache already returns a default website: 
 http://52.29.225.13/
 
-#### secure Apache
-```
-sudo nano /etc/apache2/apache2.conf
-```
-only return minimal information to the client
-```
-ServerSignature Off
-ServerTokens Prod
-```
-
-
-restrict access to all directory:
-```
-<Directory />
-   Options None
-   Require all denied
-</Directory>
-```
-
-Disable List of files in /var/www/html, but grant access for the webserver
-```
-<Directory /var/www/html>
-    Options -Indexes
-	Require all granted
-</Directory>
-```
-
-make sure the apache runs under his own user / group:
-
-```
-cat /etc/apache2/envvars
-
-it should be like: not root!!
-export APACHE_RUN_USER=www-data
-export APACHE_RUN_GROUP=www-data
-```
-
-
-```
-sudo service apache2 restart
-```
 
 ### Install python apache modul
 
@@ -215,10 +179,25 @@ It will install all dependencies like (libapache2-mod-wsgi libpython-stdlib libp
 sudo apt-get install libapache2-mod-wsgi
 ```
 
+### Setup Postgresql
+
 for the catalog we will also need a postgresql.
 ```
 sudo apt-get install postgresql
 ```
+
+create catalg database and user:
+```
+
+sudo -u postgres createuser catalog
+sudo -u postgres createdb catalog
+sudo -u postgres psql
+alter user catalog with encrypted password '***';
+grant all privileges on database catalog to catalog;
+
+```
+
+### Install python
 
 we also need some python packages:
 
@@ -234,7 +213,7 @@ sudo pip install oauth2client
 sudo pip install sqlalchemy
 ```
 
-## deploy catalog
+### deploy catalog
 we will deploy the site under /var/www/catalog.udacity.swmo.ch/
 here we use my domain swmo.ch, so i had to create an DNS A Record which points to the aws server (change to static IP in aws)
 
@@ -310,10 +289,7 @@ sudo a2ensite catalog.udacity.swmo.ch
 sudo service apache2 reload
 ```
 
-
-
-
-##deploy neighborhood-map:
+###deploy neighborhood-map:
 
 to deploy the neighborhood-map is easier, because its just html / js and css.
 
@@ -355,7 +331,7 @@ sudo service apache2 reload
 ```
 
 
-## Permisson:
+### Permisson:
 We also have to set the direcory 
 
 now change owner of the directory:
@@ -371,7 +347,45 @@ sudo chown -R www-data:www-data /var/www/neighborhood-map.udacity.swmo.ch
 sudo chmod -R 550 /var/www/neighborhood-map.udacity.swmo.ch
 ```
 
-set the mode to only 
+### secure Apache
+```
+sudo nano /etc/apache2/apache2.conf
+```
+only return minimal information to the client
+```
+ServerSignature Off
+ServerTokens Prod
+```
+
+restrict access to all directory:
+```
+<Directory />
+   Options None
+   Require all denied
+</Directory>
+```
+
+Disable List of files in /var/www/html, but grant access for the webserver
+```
+<Directory /var/www/html>
+    Options -Indexes
+	Require all granted
+</Directory>
+```
+
+make sure the apache runs under his own user / group:
+
+```
+cat /etc/apache2/envvars
+
+it should be like: not root!!
+export APACHE_RUN_USER=www-data
+export APACHE_RUN_GROUP=www-data
+```
+
+```
+sudo service apache2 restart
+```
 
 ## good to know
 - added an google-site-verification to proof the domain is mine
