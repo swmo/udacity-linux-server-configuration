@@ -282,7 +282,7 @@ catalog.udacity.swmo.ch.conf
 	</Directory>
 
 </VirtualHost>
-``
+```
 
 Now we can activate the site
 ```
