@@ -285,6 +285,7 @@ catalog.udacity.swmo.ch.conf
 ```
 
 Now we can activate the site
+
 ```
 sudo a2ensite catalog.udacity.swmo.ch
 sudo service apache2 reload
