@@ -291,7 +291,7 @@ sudo a2ensite catalog.udacity.swmo.ch
 sudo service apache2 reload
 ```
 
-###deploy neighborhood-map:
+### deploy neighborhood-map:
 
 to deploy the neighborhood-map is easier, because its just html / js and css.
 
