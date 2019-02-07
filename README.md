@@ -167,7 +167,7 @@ sudo apt-get install apache2
 ```
 
 Now the apache already returns a default website: 
-http://52.29.225.13/
+http://52.29.225.13/ -> i switched to an static ip: 3.120.9.27
 
 
 ### Install python apache modul
