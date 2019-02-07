@@ -3,8 +3,8 @@
 ## Getting started:
 the grader user information (private key / password) are submitted with the project 
 
-- catalog is deployed under: [http://catalog.udacity.swmo.ch/]: http://catalog.udacity.swmo.ch/
-- neighborhood-map is deployed under: [http://neighborhood-map.udacity.swmo.ch/]:  
+- catalog is deployed under:  http://catalog.udacity.swmo.ch/
+- neighborhood-map is deployed under: http://neighborhood-map.udacity.swmo.ch/
 
 ## Documentation:
 
