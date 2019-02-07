@@ -175,22 +175,19 @@ ServerTokens Prod
 ```
 
 
-Disable List of files
-```
-<Directory /var/www/html>
-    Options -Indexes
-    <FilesMatch "^index\.">
-	    Require all granted
-   </FilesMatch>
-</Directory>
-```
-
-restrict access to directory:
-make sure you have added the filesMatch in <Directory /var/www/html> .. </Direcotry> otherwise your index file is not accessible anymore.
+restrict access to all directory:
 ```
 <Directory />
    Options None
    Require all denied
+</Directory>
+```
+
+Disable List of files in /var/www/html, but grant access for the webserver
+```
+<Directory /var/www/html>
+    Options -Indexes
+	Require all granted
 </Directory>
 ```
 
@@ -204,13 +201,180 @@ export APACHE_RUN_USER=www-data
 export APACHE_RUN_GROUP=www-data
 ```
 
+
 ```
 sudo service apache2 restart
 ```
 
+### Install python apache modul
+
+for the catalog app i used python 2.7, so we install the apache modul (if we used python3 the package would be: libapache2-mod-wsgi-py3).
+It will install all dependencies like (libapache2-mod-wsgi libpython-stdlib libpython2.7 libpython2.7-minimal libpython2.7-stdlib python python-minimal python2.7 python2.7-minimal)
+
+```
+sudo apt-get install libapache2-mod-wsgi
+```
+
+for the catalog we will also need a postgresql.
+```
+sudo apt-get install postgresql
+```
+
+we also need some python packages:
+
+Install python packages:
+
+```
+sudo apt-get install python-pip
+sudo pip install flask
+sudo pip install flask_wtf
+sudo pip install flask_bcrypt
+sudo pip install python-resize-image
+sudo pip install oauth2client
+sudo pip install sqlalchemy
+```
+
+## deploy catalog
+we will deploy the site under /var/www/catalog.udacity.swmo.ch/
+here we use my domain swmo.ch, so i had to create an DNS A Record which points to the aws server (change to static IP in aws)
+
+prepare the directories:
+```
+cd /var/www/
+mkdir catalog.udacity.swmo.ch
+```
+
+now deploy the code. i had to do a few changes (postgres instead of sqllite), and a public folder (for document root) better than use the hole python code under the document root.
+thats the reason we i use in this execirse an "deploy" branch.
+so lets checkout the code:
+
+```
+sudo git clone https://github.com/swmo/udacity-catalog.git .
+sudo git checkout deploy
+```
+
+we need to have an a wsgi file, which we will use with apache:
+
+/var/www/catalog.udacity.swmo.ch/catalog.wsgi
+
+```
+#!/usr/bin/python
+import sys
+sys.path.insert(0, '/var/www/catalog.udacity.swmo.ch/')
+
+from app import app as application
+application.root_path = '/var/www/catalog.udacity.swmo.ch/'
+application.secret_key = 'fklsjfdlajiejrkaejrklajlnIE((*HFUFHU'
+```
+
+now we can start to configure apache for the catalog site
+
+```
+cd /etc/apache2/sites-available
+sudo cp 000-default.conf catalog.udacity.swmo.ch.conf
+```
+
+catalog.udacity.swmo.ch.conf
+- ServerName: need to be the domain / subdomain
+- DocumentRoot: points to the public folder, so the other python code is better protected
+- set the Error and Access Log path.
+- define under which user the wsgi run
+- let apchae acces the public folder (require all granted)
+```
+<VirtualHost *:80>
+	ServerName catalog.udacity.swmo.ch
+
+	ServerAdmin moses.tschanz@gmail.com
+	DocumentRoot /var/www/catalog.udacity.swmo.ch/public
+
+	ErrorLog ${APACHE_LOG_DIR}/catalog.udacity.swmo.ch.error.log
+	CustomLog ${APACHE_LOG_DIR}/catalog.udacity.swmo.ch.access.log combined
+
+	WSGIDaemonProcess catalog user=www-data group=www-data threads=5
+
+	Alias /static/ /var/www/catalog.udacity.swmo.ch/public/static/
+	<Directory /var/www/catalog.udacity.swmo.ch/public/static>
+		Require all granted
+	</Directory>
+	WSGIScriptAlias / /var/www/catalog.udacity.swmo.ch/public/catalog.wsgi
+	<Directory /var/www/catalog.udacity.swmo.ch/public>
+		Require all granted
+	</Directory>
+
+</VirtualHost>
+``
+
+Now we can activate the site
+```
+sudo a2ensite catalog.udacity.swmo.ch
+sudo service apache2 reload
+```
 
 
 
+
+##deploy neighborhood-map:
+
+to deploy the neighborhood-map is easier, because its just html / js and css.
+
+first we deploy the code:
+
+```
+cd /var/www/
+sudo mkdir neighborhood-map.udacity.swmo.ch
+cd neighborhood-map.udacity.swmo.ch
+#all files need to be public:
+sudo git clone https://github.com/swmo/udacity-neighborhood-map.git public
+```
+
+now we can make a new site
+
+```
+cd /etc/apache2/sites-available
+sudo cp 000-default.conf neighborhood-map.udacity.swmo.ch.conf
+```
+
+/etc/apache2/sites-available/neighborhood-map.udacity.swmo.ch.conf:
+```
+<VirtualHost *:80>
+        ServerName neighborhood-map.udacity.swmo.ch
+        ServerAdmin moses.tschanz@gmail.com
+        DocumentRoot /var/www/neighborhood-map.udacity.swmo.ch/public
+        ErrorLog ${APACHE_LOG_DIR}/neighborhood-map.udacity.swmo.ch.error.log
+        CustomLog ${APACHE_LOG_DIR}/neighborhood-map.udacity.swmo.ch.access.log combined
+        <Directory /var/www/neighborhood-map.udacity.swmo.ch/public>
+                Require all granted
+        </Directory>
+</VirtualHost>
+```
+
+Now we can activate the site
+```
+sudo a2ensite neighborhood-map.udacity.swmo.ch
+sudo service apache2 reload
+```
+
+
+## Permisson:
+We also have to set the direcory 
+
+now change owner of the directory:
+allow minimal rights
+```
+sudo chown -R www-data:www-data /var/www/html
+sudo chown -R www-data:www-data /var/www/catalog.udacity.swmo.ch
+sudo chmod -R 550 /var/www/catalog.udacity.swmo.ch
+#make sure the server cat write to to store the profile images (upload)
+sudo chmod -R 770 /var/www/catalog.udacity.swmo.ch/public/static/uploads
+
+sudo chown -R www-data:www-data /var/www/neighborhood-map.udacity.swmo.ch
+sudo chmod -R 550 /var/www/neighborhood-map.udacity.swmo.ch
+```
+
+set the mode to only 
+
+## good to know
+- added an google-site-verification to proof the domain is mine
 
 
 
@@ -220,3 +384,4 @@ sudo service apache2 restart
 - http://www.linuxlookup.com/howto/change_default_ssh_port
 - https://blog.buettner.xyz/sichere-ssh-konfiguration/
 - https://www.tecmint.com/apache-security-tips/
+- https://www.bogotobogo.com/python/Flask/Python_Flask_HelloWorld_App_with_Apache_WSGI_Ubuntu14.php
